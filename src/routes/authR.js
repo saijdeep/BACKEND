@@ -76,9 +76,11 @@ authRouter.post("/login",async(req,res) => {
          //Add the token to cookie and send the respone back to user
             res.cookie("token", token , {
                 expires :new Date(Date.now() + 8*3600000),
-                httpOnly: false,
-                secure: false,
-                sameSite: "lax"
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+                domain: ".onrender.com",
+                path: "/"
             });
            res.json({
                message: "Login successful",
@@ -123,6 +125,26 @@ authRouter.post("/logout",async(req,res) => {
         res.status(500).json({
             error: "Failed to logout"
         });
+    }
+});
+
+// Forgot Password Endpoint
+
+authRouter.post("/forgot-password", async (req, res) => {
+    try {
+        const { emailId } = req.body;
+        if (!emailId) {
+            return res.status(400).json({ error: "Email is required" });
+        }
+        const user = await User.findOne({ emailId });
+        if (!user) {
+            return res.status(404).json({ error: "No user found with this email" });
+        }
+        // Simulate sending email (in real app, send email here)
+        return res.json({ message: "Password reset link sent to your email (simulated)." });
+    } catch (err) {
+        console.error("Forgot password error:", err);
+        res.status(500).json({ error: "Failed to process forgot password request" });
     }
 });
 
